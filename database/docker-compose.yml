@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  db3:
+    image: postgres:latest
+    container_name: book_container
+    environment:
+      POSTGRES_USER: user3
+      POSTGRES_PASSWORD: password3
+      POSTGRES_DB: db3
+    ports:
+      - "5434:5432"
+    volumes:
+      - db3-data:/var/lib/postgresql/data
+
+volumes:
+  db3-data:
