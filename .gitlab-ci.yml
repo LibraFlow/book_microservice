@@ -6,22 +6,21 @@ stages:
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-    - book_service/.m2/
+    - book_service/.gradle/
 
 build_backend:
   stage: build
-  image: maven:3.8.4-openjdk-11
+  image: gradle:7.4.2-jdk11  # Use a Gradle image with the desired JDK version
   script:
     - cd book_service
-    - mvn clean package
+    - gradle clean build  # Use Gradle commands instead of Maven
   artifacts:
     paths:
-      - book_service/target/*.jar
-
+      - book_service/build/libs/*.jar  # Update the path to the built JAR files
 
 test_backend:
   stage: test
-  image: maven:3.8.4-openjdk-11
+  image: gradle:7.4.2-jdk11  # Use the same Gradle image
   script:
     - cd book_service
-    - mvn test
+    - gradle test  # Use Gradle to run tests
