@@ -1,0 +1,27 @@
+stages:
+  - build
+  - test
+
+# Cache dependencies to speed up builds
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - book_service/.m2/
+
+build_backend:
+  stage: build
+  image: maven:3.8.4-openjdk-11
+  script:
+    - cd book_service
+    - mvn clean package
+  artifacts:
+    paths:
+      - book_service/target/*.jar
+
+
+test_backend:
+  stage: test
+  image: maven:3.8.4-openjdk-11
+  script:
+    - cd book_service
+    - mvn test
