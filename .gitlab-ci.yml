@@ -1,26 +1,47 @@
 stages:
   - build
   - test
+  - deploy
 
-# Cache dependencies to speed up builds
+variables:
+  # Gradle-specific variables
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+# Cache Gradle dependencies to speed up builds
 cache:
-  key: ${CI_COMMIT_REF_SLUG}
   paths:
-    - book_service/.gradle/
+    - .gradle/wrapper
+    - .gradle/caches
 
-build_backend:
+build:
   stage: build
-  image: gradle:7.4.2-jdk11  # Use a Gradle image with the desired JDK version
+  image: gradle:jdk17 # Use the appropriate Gradle and JDK version for your project
   script:
-    - cd book_service # Go to book_service
-    - gradle clean build  # Use Gradle commands instead of Maven
+    - cd book_service
+    - gradle build
   artifacts:
     paths:
-      - book_service/build/libs/*.jar  # Update the path to the built JAR files
+      - book_service/build/libs/*.jar
 
-test_backend:
+test:
   stage: test
-  image: gradle:7.4.2-jdk11  # Use the same Gradle image
+  image: gradle:jdk17
   script:
-    - cd book_service # Go to book_service
-    - gradle test  # Use Gradle to run tests
+    - cd book_service
+    - gradle test
+  dependencies:
+    - build
+
+deploy:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - cd database
+    - docker-compose up -d
+    - cd ../book_service
+    - docker build -t book_service:latest .
+    - docker run -d --name book_service_app --network host book_service:latest
+  only:
+    - main # Deploy only when changes are pushed to the main branch
