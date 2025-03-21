@@ -12,7 +12,7 @@ build_backend:
   stage: build
   image: gradle:7.4.2-jdk11  # Use a Gradle image with the desired JDK version
   script:
-    - cd book_service
+    - cd book_service # Go to book_service
     - gradle clean build  # Use Gradle commands instead of Maven
   artifacts:
     paths:
@@ -22,5 +22,5 @@ test_backend:
   stage: test
   image: gradle:7.4.2-jdk11  # Use the same Gradle image
   script:
-    - cd book_service
+    - cd book_service # Go to book_service
     - gradle test  # Use Gradle to run tests
