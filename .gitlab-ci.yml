@@ -1,4 +1,5 @@
 stages:
+  - lint
   - build
   - test
   - deploy
@@ -13,9 +14,17 @@ cache:
     - .gradle/wrapper
     - .gradle/caches
 
+lint:
+  stage: lint
+  image: gradle:jdk17
+  script:
+    - cd book_service
+    - gradle ktlintCheck # or gradle checkstyleMain, depending on your linting tool
+  allow_failure: true # Optional: Allows the pipeline to continue even if linting fails
+
 build:
   stage: build
-  image: gradle:jdk17 # Use the appropriate Gradle and JDK version for your project
+  image: gradle:jdk17
   script:
     - cd book_service
     - gradle build
