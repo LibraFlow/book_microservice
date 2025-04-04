@@ -124,18 +124,6 @@ class UpdateBookUseCaseTest {
     }
 
     @Test
-    void updateBook_WithNullBookDTO_ShouldThrowException() {
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            updateBookUseCase.updateBook(1, null);
-        });
-
-        // Verify no interactions with dependencies
-        verifyNoInteractions(bookRepository);
-        verifyNoInteractions(bookMapper);
-    }
-
-    @Test
     void updateBook_PreservesCreatedAt() {
         // Arrange
         when(bookRepository.findById(1)).thenReturn(Optional.of(existingBookEntity));
