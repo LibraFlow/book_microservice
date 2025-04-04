@@ -134,4 +134,4 @@ public class BookControllerTest {
         assertEquals(testBookDTO, response.getBody());
         verify(updateBookUseCase, times(1)).updateBook(bookId, testBookDTO);
     }
-} 
+}
