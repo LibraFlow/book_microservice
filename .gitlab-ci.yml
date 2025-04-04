@@ -28,7 +28,10 @@ test:
   image: gradle:jdk17
   script:
     - cd book_service
-    - gradle test
+    - gradle test jacocoTestReport
+  artifacts:
+    reports:
+      jacoco: book_service/build/reports/jacoco/test/html/
   dependencies:
     - build
 

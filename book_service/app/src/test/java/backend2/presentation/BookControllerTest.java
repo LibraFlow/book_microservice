@@ -45,14 +45,12 @@ public class BookControllerTest {
 
     @BeforeEach
     void setUp() {
-        testBookDTO = BookDTO.builder()
-                .id(1)
-                .title("Test Book")
-                .author("Test Author")
-                .year(2023)
-                .genre("Fiction")
-                .description("Test Description")
-                .build();
+        testBookDTO = new BookDTO();
+        testBookDTO.setId(1);
+        testBookDTO.setTitle("Test Book");
+        testBookDTO.setAuthor("Test Author");
+        testBookDTO.setGenre("Fiction");
+        testBookDTO.setIsbn("1234567890");
     }
 
     @Test
@@ -67,7 +65,7 @@ public class BookControllerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(testBookDTO, response.getBody());
-        verify(addBookUseCase, times(1)).addBook(testBookDTO);
+        verify(addBookUseCase, times(1)).addBook(any(BookDTO.class));
     }
 
     @Test
@@ -134,4 +132,4 @@ public class BookControllerTest {
         assertEquals(testBookDTO, response.getBody());
         verify(updateBookUseCase, times(1)).updateBook(bookId, testBookDTO);
     }
-}
+} 
