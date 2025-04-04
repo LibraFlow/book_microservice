@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,11 +34,11 @@ class UpdateBookUseCaseTest {
     private BookEntity existingBookEntity;
     private BookEntity updatedBookEntity;
     private BookEntity savedBookEntity;
-    private LocalDateTime testCreatedAt;
+    private LocalDate testCreatedAt;
 
     @BeforeEach
     void setUp() {
-        testCreatedAt = LocalDateTime.now();
+        testCreatedAt = LocalDate.now();
         
         // Initialize test data
         testBookDTO = BookDTO.builder()
