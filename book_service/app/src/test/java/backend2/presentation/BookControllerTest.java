@@ -49,14 +49,14 @@ public class BookControllerTest {
                 .id(1)
                 .title("Test Book")
                 .author("Test Author")
-                .genre("Fiction")
+                .genre("Horror")
                 .year(2023)
                 .description("Test Description")
                 .build();
     }
 
     @Test
-    void createBook_ShouldReturnCreatedBook() {
+    void createBookTest() {
         // Arrange
         when(addBookUseCase.addBook(any(BookDTO.class))).thenReturn(testBookDTO);
 
@@ -71,7 +71,7 @@ public class BookControllerTest {
     }
 
     @Test
-    void deleteBook_ShouldReturnNoContent() {
+    void deleteBookTest() {
         // Arrange
         Integer bookId = 1;
         doNothing().when(deleteBookUseCase).deleteBook(anyInt());
@@ -86,7 +86,7 @@ public class BookControllerTest {
     }
 
     @Test
-    void getBook_ShouldReturnBook() {
+    void getBookTest() {
         // Arrange
         Integer bookId = 1;
         when(getBookUseCase.getBook(anyInt())).thenReturn(testBookDTO);
@@ -102,9 +102,9 @@ public class BookControllerTest {
     }
 
     @Test
-    void getAllBooksByGenre_ShouldReturnBooks() {
+    void getAllBooksByGenreTest() {
         // Arrange
-        String genre = "Fiction";
+        String genre = "Horror";
         List<BookDTO> expectedBooks = Arrays.asList(testBookDTO);
         when(getAllBooksByGenreUseCase.getAllBooksByGenre(anyString())).thenReturn(expectedBooks);
 
@@ -120,7 +120,7 @@ public class BookControllerTest {
     }
 
     @Test
-    void updateBook_ShouldReturnUpdatedBook() {
+    void updateBookTest() {
         // Arrange
         Integer bookId = 1;
         when(updateBookUseCase.updateBook(anyInt(), any(BookDTO.class))).thenReturn(testBookDTO);
