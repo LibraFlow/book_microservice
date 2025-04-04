@@ -45,12 +45,14 @@ public class BookControllerTest {
 
     @BeforeEach
     void setUp() {
-        testBookDTO = new BookDTO();
-        testBookDTO.setId(1);
-        testBookDTO.setTitle("Test Book");
-        testBookDTO.setAuthor("Test Author");
-        testBookDTO.setGenre("Fiction");
-        testBookDTO.setIsbn("1234567890");
+        testBookDTO = BookDTO.builder()
+                .id(1)
+                .title("Test Book")
+                .author("Test Author")
+                .genre("Fiction")
+                .year(2023)
+                .description("Test Description")
+                .build();
     }
 
     @Test
