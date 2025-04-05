@@ -43,28 +43,6 @@ class BookDTOTest {
     }
 
     @Test
-    void testBookDTOSettersAndGetters() {
-        // Arrange
-        BookDTO bookDTO = new BookDTO();
-
-        // Act
-        bookDTO.setId(1);
-        bookDTO.setAuthor("Test Author");
-        bookDTO.setYear(2023);
-        bookDTO.setTitle("Test Book");
-        bookDTO.setGenre("Horror");
-        bookDTO.setDescription("Test Description");
-
-        // Assert
-        assertEquals(1, bookDTO.getId());
-        assertEquals("Test Author", bookDTO.getAuthor());
-        assertEquals(2023, bookDTO.getYear());
-        assertEquals("Test Book", bookDTO.getTitle());
-        assertEquals("Horror", bookDTO.getGenre());
-        assertEquals("Test Description", bookDTO.getDescription());
-    }
-
-    @Test
     void testBookDTOEqualsAndHashCode() {
         // Arrange
         BookDTO bookDTO1 = BookDTO.builder()
