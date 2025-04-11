@@ -1,7 +1,7 @@
 stages:
   - build
   - test
-  - deploy
+  # - deploy
 
 variables:
   # Gradle-specific variables
@@ -32,16 +32,16 @@ test:
   dependencies:
     - build
 
-deploy:
-  stage: deploy
-  image: docker:latest
-  services:
-    - docker:dind
-  script:
-    - cd database
-    - docker-compose up -d
-    - cd ../book_service
-    - docker build -t book_service:latest .
-    - docker run -d --name book_service_app --network host book_service:latest
-  only:
-    - main # Deploy only when changes are pushed to the main branch
+# deploy:
+#   stage: deploy
+#   image: docker:latest
+#   services:
+#     - docker:dind
+#   script:
+#     - cd database
+#     - docker-compose up -d
+#     - cd ../book_service
+#     - docker build -t book_service:latest .
+#     - docker run -d --name book_service_app --network host book_service:latest
+#   only:
+#     - main # Deploy only when changes are pushed to the main branch
