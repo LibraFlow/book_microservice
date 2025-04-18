@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  db3:
+    image: postgres:latest
+    container_name: book_container
+    environment:
+      POSTGRES_USER: user3
+      POSTGRES_PASSWORD: password3
+      POSTGRES_DB: db3
+    ports:
+      - "5434:5432"
+    volumes:
+      - db3-data:/var/lib/postgresql/data
+    networks:
+      - book-network
+
+  book-service:
+    build:
+      context: ./book_service
+      dockerfile: Dockerfile
+    container_name: book-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db3:5432/db3
+      - SPRING_DATASOURCE_USERNAME=user3
+      - SPRING_DATASOURCE_PASSWORD=password3
+    depends_on:
+      - db3
+    networks:
+      - book-network
+
+volumes:
+  db3-data:
+
+networks:
+  book-network:
+    driver: bridge 
