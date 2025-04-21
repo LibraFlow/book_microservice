@@ -97,11 +97,8 @@ test:
 deploy:
   stage: deploy
   image: google/cloud-sdk:latest
-  services:
-    - docker:dind
   variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: npipe:////./pipe/docker_engine
   script:
     - $bytes = [System.Text.Encoding]::UTF8.GetBytes($GCP_SERVICE_ACCOUNT_KEY)
     - $encodedText = [Convert]::ToBase64String($bytes)
