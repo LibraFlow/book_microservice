@@ -2,6 +2,7 @@ stages:
 - security_testing
 - build
 - test
+- deploy
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -91,3 +92,16 @@ test:
   - gradle test
   dependencies:
   - build
+
+deploy:
+  stage: deploy
+  image: gradle:jdk17
+  script:
+    - cd book_service
+    - gradle build
+    - docker-compose down
+    - docker-compose up -d --build
+  dependencies:
+    - test
+  only:
+    - main  # Only deploy when changes are pushed to main branch
