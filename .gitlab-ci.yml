@@ -103,8 +103,10 @@ deploy:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   script:
-    - echo $GCP_SERVICE_ACCOUNT_KEY | base64 -d > /tmp/key.json
-    - gcloud auth activate-service-account --key-file=/tmp/key.json
+    - $bytes = [System.Text.Encoding]::UTF8.GetBytes($GCP_SERVICE_ACCOUNT_KEY)
+    - $encodedText = [Convert]::ToBase64String($bytes)
+    - Set-Content -Path "$env:TEMP\key.json" -Value $GCP_SERVICE_ACCOUNT_KEY
+    - gcloud auth activate-service-account --key-file="$env:TEMP\key.json"
     - gcloud config set project $GCP_PROJECT_ID
     - gcloud auth configure-docker ${GCP_REGION}-docker.pkg.dev
     - docker build -t $DOCKER_IMAGE ./book_service
