@@ -118,7 +118,8 @@ deploy:
       --platform=managed
       --region=$GCP_REGION
       --allow-unauthenticated
-      --set-env-vars="SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5434/db3,SPRING_DATASOURCE_USERNAME=user3,SPRING_DATASOURCE_PASSWORD=password3"
       --port=8080
+      --set-env-vars="^::^SPRING_PROFILES_ACTIVE=prod,SPRING_DATASOURCE_URL=jdbc:postgresql:///db3?cloudSqlInstance=${GCP_PROJECT_ID}:europe-west4:book-service-db&socketFactory=com.google.cloud.sql.postgres.SocketFactory,SPRING_DATASOURCE_USERNAME=user3,SPRING_DATASOURCE_PASSWORD=password3"
+      --add-cloudsql-instances=${GCP_PROJECT_ID}:europe-west4:book-service-db
   only:
     - main

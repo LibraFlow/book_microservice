@@ -35,6 +35,8 @@ dependencies {
     // PostgreSQL dependencies
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.postgresql:postgresql:42.6.0'
+    // Add Cloud SQL Socket Factory
+    implementation 'com.google.cloud.sql:postgres-socket-factory:1.16.0'
 
     // Jakarta Validation API
     implementation 'jakarta.validation:jakarta.validation-api'
