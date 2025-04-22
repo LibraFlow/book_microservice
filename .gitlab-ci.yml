@@ -120,7 +120,7 @@ deploy:
       --allow-unauthenticated
       --port=8080
       --set-env-vars="^::^SPRING_PROFILES_ACTIVE=prod,SPRING_DATASOURCE_URL=jdbc:postgresql:///db3?cloudSqlInstance=${GCP_PROJECT_ID}:europe-west4:book-service-db&socketFactory=com.google.cloud.sql.postgres.SocketFactory,SPRING_DATASOURCE_USERNAME=user3,SPRING_DATASOURCE_PASSWORD=password3"
-      --add-cloudsql-instances=${GCP_PROJECT_ID}:europe-west4:book-service-db
+      --set-cloudsql-instances=${GCP_PROJECT_ID}:europe-west4:book-service-db
       --min-instances=1
       --max-instances=3
       --cpu=1
@@ -128,6 +128,5 @@ deploy:
       --timeout=300
       --execution-environment=gen2
       --service-account=${GCP_SERVICE_ACCOUNT}
-      --set-cloudsql-instances=${GCP_PROJECT_ID}:europe-west4:book-service-db
   only:
     - main
