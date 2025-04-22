@@ -6,5 +6,7 @@ RUN ./gradlew bootJar
 FROM openjdk:21-jdk-slim
 WORKDIR /app
 COPY --from=build /app/app/build/libs/*.jar app.jar
+
+ENV PORT=8080
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"] 
+CMD ["java", "-jar", "app.jar"] 
