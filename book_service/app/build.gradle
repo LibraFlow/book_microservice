@@ -33,10 +33,12 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     // PostgreSQL dependencies
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.postgresql:postgresql:42.6.0'
-    // Add Cloud SQL Socket Factory
+    
+    // Cloud SQL dependencies
     implementation 'com.google.cloud.sql:postgres-socket-factory:1.16.0'
+    implementation 'com.google.cloud:spring-cloud-gcp-starter:5.0.4'
+    implementation 'com.google.cloud:spring-cloud-gcp-starter-sql-postgresql:5.0.4'
 
     // Jakarta Validation API
     implementation 'jakarta.validation:jakarta.validation-api'
@@ -45,13 +47,13 @@ dependencies {
     implementation 'org.owasp.encoder:encoder:1.2.3'
 
     // Use JUnit Jupiter for testing.
-    testImplementation libs.junit.jupiter
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 
     // Mockito dependencies
     testImplementation 'org.mockito:mockito-core:5.10.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.10.0'
 
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // This dependency is used by the application.
     implementation libs.guava
