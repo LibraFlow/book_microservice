@@ -15,7 +15,7 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1
 
-# Create a simple startup script
+# Create startup script
 RUN echo '#!/bin/sh' > /app/start.sh && \
     echo 'echo "Starting application with JAVA_OPTS: $JAVA_OPTS"' >> /app/start.sh && \
     echo 'exec java $JAVA_OPTS -jar app.jar' >> /app/start.sh && \
