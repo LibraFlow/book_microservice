@@ -47,13 +47,7 @@ dependency_check:
   script:
     - cd book_service
     - mkdir -p app/dependency-check-data
-    - |
-      try {
-        gradle dependencyCheckAnalyze
-      } catch {
-        Write-Host "::warning::Dependency check failed to run. This might be due to missing NVD API key."
-        Write-Host "::warning::Consider setting up an NVD API key for more accurate results."
-      }
+    - gradle dependencyCheckAnalyze || Write-Host "::warning::Dependency check failed to run. This might be due to missing NVD API key."
     # Check if dependency check report exists and contains vulnerabilities
     - |
       if (Test-Path "app/build/reports/dependency-check-report.html") {
@@ -66,12 +60,11 @@ dependency_check:
         }
       } else {
         Write-Host "::warning::Dependency check report not generated. This might be due to missing NVD API key."
-        Write-Host "::warning::Consider setting up an NVD API key for more accurate results."
         exit 0
       }
   artifacts:
     reports:
-      security: book_service/app/build/reports/dependency-check-report.html
+      dependency_scanning: book_service/app/build/reports/dependency-check-report.json
     paths:
       - book_service/app/build/reports/dependency-check-report.html
       - book_service/app/build/reports/dependency-check-report.json
@@ -134,7 +127,6 @@ deploy:
         --memory=1Gi `
         --timeout=300 `
         --execution-environment=gen2 `
-        --service-account=${GCP_SERVICE_ACCOUNT} `
-        --set-cloudsql-instances=${GCP_PROJECT_ID}:europe-west4:book-service-db
+        --service-account=${GCP_SERVICE_ACCOUNT}
   only:
     - main
