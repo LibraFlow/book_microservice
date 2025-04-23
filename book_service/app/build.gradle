@@ -14,7 +14,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.3'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'com.github.spotbugs' version '6.0.7'
-    // id 'org.owasp.dependencycheck' version '9.0.9'
+    id 'org.owasp.dependencycheck' version '9.0.9'
 }
 
 repositories {
@@ -88,19 +88,24 @@ tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
 }
 
 // Dependency Check configuration
-/*
 dependencyCheck {
     format = 'HTML'
-    failBuildOnCVSS = 0
+    failBuildOnCVSS = 7
     suppressionFile = 'dependency-check-suppressions.xml'
     analyzers {
         assemblyEnabled = false
+        ossIndexEnabled = false
     }
     // Use local data only
     data {
         directory = 'dependency-check-data'
     }
+    // Configure NVD API key if available
+    if (System.getenv('NVD_API_KEY')) {
+        nvd {
+            apiKey = System.getenv('NVD_API_KEY')
+        }
+    }
     // Disable automatic updates
     autoUpdate = false
 }
-*/
