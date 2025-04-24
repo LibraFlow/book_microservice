@@ -38,7 +38,7 @@ dependencies {
     
     // Cloud SQL dependencies
     implementation 'com.google.cloud.sql:postgres-socket-factory:1.15.1'
-    
+
     // Jakarta Validation API
     implementation 'jakarta.validation:jakarta.validation-api'
 
