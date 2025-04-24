@@ -14,7 +14,7 @@ spec:
       labels:
         app: book-service
     spec:
-      serviceAccountName: kubernetes-deploy@libraflow-457510.iam.gserviceaccount.com
+      serviceAccountName: cloudsql-sa
       containers:
       - name: book-service
         image: ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/book-service/book-service:${CI_COMMIT_SHA}
