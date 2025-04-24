@@ -143,7 +143,7 @@ deploy-kubernetes:
   script:
     # Check if Docker is running
     - if (!(Test-Path "//./pipe/docker_engine")) { throw "Docker Desktop is not running. Please start Docker Desktop and try again." }
-    # Handle Kubernetes service account
+    # Handle service account
     - $bytes = [System.Text.Encoding]::UTF8.GetBytes($GCP_K8S_SERVICE_ACCOUNT_KEY)
     - $encodedText = [Convert]::ToBase64String($bytes)
     - Set-Content -Path "$env:TEMP\k8s-key.json" -Value $GCP_K8S_SERVICE_ACCOUNT_KEY
@@ -158,6 +158,8 @@ deploy-kubernetes:
     - gcloud container clusters get-credentials $KUBE_CLUSTER --region $GCP_REGION --project $GCP_PROJECT_ID
     # Create namespace if it doesn't exist
     - kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+    # Create service account and role binding
+    - kubectl apply -f ./book_service/kubernetes/service-account.yaml -n $KUBE_NAMESPACE
     # Prepare secrets
     - $datasourceUrl = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("jdbc:postgresql://${GCP_PROJECT_ID}:europe-west4:book-service-db/db3"))
     - $datasourceUsername = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("user3"))
