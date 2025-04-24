@@ -38,6 +38,8 @@ static_analysis:
         }
       }
   artifacts:
+    when: always
+    expire_in: 1 week
     reports:
       codequality: book_service/app/build/reports/spotbugs/main.xml
     paths:
