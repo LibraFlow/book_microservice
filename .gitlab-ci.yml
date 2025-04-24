@@ -143,7 +143,7 @@ deploy-kubernetes:
   script:
     # Check if Docker is running
     - if (!(Test-Path "//./pipe/docker_engine")) { throw "Docker Desktop is not running. Please start Docker Desktop and try again." }
-    # Handle Kubernetes service account
+    # Handle service account
     - $bytes = [System.Text.Encoding]::UTF8.GetBytes($GCP_K8S_SERVICE_ACCOUNT_KEY)
     - $encodedText = [Convert]::ToBase64String($bytes)
     - Set-Content -Path "$env:TEMP\k8s-key.json" -Value $GCP_K8S_SERVICE_ACCOUNT_KEY
@@ -151,25 +151,30 @@ deploy-kubernetes:
     - gcloud auth activate-service-account --key-file="$env:TEMP\k8s-key.json"
     - gcloud config set project $GCP_PROJECT_ID
     - gcloud auth configure-docker ${GCP_REGION}-docker.pkg.dev
-    # Build and push Docker image (reuse the same image)
+    # Build and push Docker image
     - docker build -t $DOCKER_IMAGE ./book_service
     - docker push $DOCKER_IMAGE
     # Configure kubectl
     - gcloud container clusters get-credentials $KUBE_CLUSTER --region $GCP_REGION --project $GCP_PROJECT_ID
     # Create namespace if it doesn't exist
     - kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
-    # Prepare secrets
-    - $datasourceUrl = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("jdbc:postgresql://${GCP_PROJECT_ID}:europe-west4:book-service-db/db3"))
+    # Create secrets
+    - $datasourceUrl = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("jdbc:postgresql://${GCP_PROJECT_ID}:${GCP_REGION}:book-service-db/db3"))
     - $datasourceUsername = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("user3"))
     - $datasourcePassword = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("password3"))
-    # Deploy secrets
     - (Get-Content ./book_service/kubernetes/secrets.yaml) -replace '\${BASE64_ENCODED_DATASOURCE_URL}', $datasourceUrl -replace '\${BASE64_ENCODED_DATASOURCE_USERNAME}', $datasourceUsername -replace '\${BASE64_ENCODED_DATASOURCE_PASSWORD}', $datasourcePassword | kubectl apply -f - -n $KUBE_NAMESPACE
-    # Deploy application
+    # Create and annotate service account for Cloud SQL proxy
+    - kubectl create serviceaccount cloudsql-sa -n $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+    - kubectl annotate serviceaccount cloudsql-sa -n $KUBE_NAMESPACE "iam.gke.io/gcp-service-account=kubernetes-deploy@${GCP_PROJECT_ID}.iam.gserviceaccount.com" --overwrite
+    # Apply Cloud SQL proxy deployment
     - kubectl apply -f ./book_service/kubernetes/cloudsql-proxy.yaml -n $KUBE_NAMESPACE
+    # Apply main service deployment
     - kubectl apply -f ./book_service/kubernetes/deployment.yaml -n $KUBE_NAMESPACE
     - kubectl apply -f ./book_service/kubernetes/service.yaml -n $KUBE_NAMESPACE
-    # Wait for deployments to be ready
-    - kubectl rollout status deployment/cloudsql-proxy -n $KUBE_NAMESPACE --timeout=300s
-    - kubectl rollout status deployment/book-service -n $KUBE_NAMESPACE --timeout=300s
+  dependencies:
+    - static_analysis
+    - build
+  needs:
+    - deploy-cloud-run
   only:
     - main
