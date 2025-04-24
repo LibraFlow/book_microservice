@@ -2,7 +2,7 @@ stages:
 - security_testing
 - build
 - test
-# - deploy-cloud-run  # Commented out Cloud Run stage
+- deploy-cloud-run
 - deploy-kubernetes
 
 variables:
@@ -95,45 +95,45 @@ test:
   dependencies:
   - build
 
-# deploy-cloud-run:  # Commented out entire Cloud Run deployment
-#   stage: deploy-cloud-run
-#   image: google/cloud-sdk:latest
-#   variables:
-#     DOCKER_HOST: npipe:////./pipe/docker_engine
-#   script:
-#     # Check if Docker is running
-#     - if (!(Test-Path "//./pipe/docker_engine")) { throw "Docker Desktop is not running. Please start Docker Desktop and try again." }
-#     # Handle service account
-#     - $bytes = [System.Text.Encoding]::UTF8.GetBytes($GCP_SERVICE_ACCOUNT_KEY)
-#     - $encodedText = [Convert]::ToBase64String($bytes)
-#     - Set-Content -Path "$env:TEMP\key.json" -Value $GCP_SERVICE_ACCOUNT_KEY
-#     # Configure Google Cloud
-#     - gcloud auth activate-service-account --key-file="$env:TEMP\key.json"
-#     - gcloud config set project $GCP_PROJECT_ID
-#     - gcloud auth configure-docker ${GCP_REGION}-docker.pkg.dev
-#     # Build and push Docker image
-#     - docker build -t $DOCKER_IMAGE ./book_service
-#     - docker push $DOCKER_IMAGE
-#     # Deploy to Cloud Run
-#     - |
-#       gcloud run deploy book-service `
-#         --image=$DOCKER_IMAGE `
-#         --platform=managed `
-#         --region=$GCP_REGION `
-#         --allow-unauthenticated `
-#         --port=8080 `
-#         --set-env-vars="SPRING_PROFILES_ACTIVE=prod" `
-#         --set-env-vars="INSTANCE_CONNECTION_NAME=${GCP_PROJECT_ID}:europe-west4:book-service-db" `
-#         --set-cloudsql-instances=${GCP_PROJECT_ID}:europe-west4:book-service-db `
-#         --min-instances=1 `
-#         --max-instances=3 `
-#         --cpu=1 `
-#         --memory=1Gi `
-#         --timeout=300 `
-#         --execution-environment=gen2 `
-#         --service-account=${GCP_SERVICE_ACCOUNT}
-#   only:
-#     - main
+deploy-cloud-run:
+  stage: deploy-cloud-run
+  image: google/cloud-sdk:latest
+  variables:
+    DOCKER_HOST: npipe:////./pipe/docker_engine
+  script:
+    # Check if Docker is running
+    - if (!(Test-Path "//./pipe/docker_engine")) { throw "Docker Desktop is not running. Please start Docker Desktop and try again." }
+    # Handle service account
+    - $bytes = [System.Text.Encoding]::UTF8.GetBytes($GCP_SERVICE_ACCOUNT_KEY)
+    - $encodedText = [Convert]::ToBase64String($bytes)
+    - Set-Content -Path "$env:TEMP\key.json" -Value $GCP_SERVICE_ACCOUNT_KEY
+    # Configure Google Cloud
+    - gcloud auth activate-service-account --key-file="$env:TEMP\key.json"
+    - gcloud config set project $GCP_PROJECT_ID
+    - gcloud auth configure-docker ${GCP_REGION}-docker.pkg.dev
+    # Build and push Docker image
+    - docker build -t $DOCKER_IMAGE ./book_service
+    - docker push $DOCKER_IMAGE
+    # Deploy to Cloud Run
+    - |
+      gcloud run deploy book-service `
+        --image=$DOCKER_IMAGE `
+        --platform=managed `
+        --region=$GCP_REGION `
+        --allow-unauthenticated `
+        --port=8080 `
+        --set-env-vars="SPRING_PROFILES_ACTIVE=prod" `
+        --set-env-vars="INSTANCE_CONNECTION_NAME=${GCP_PROJECT_ID}:europe-west4:book-service-db" `
+        --set-cloudsql-instances=${GCP_PROJECT_ID}:europe-west4:book-service-db `
+        --min-instances=1 `
+        --max-instances=3 `
+        --cpu=1 `
+        --memory=1Gi `
+        --timeout=300 `
+        --execution-environment=gen2 `
+        --service-account=${GCP_SERVICE_ACCOUNT}
+  only:
+    - main
 
 deploy-kubernetes:
   stage: deploy-kubernetes
@@ -143,7 +143,7 @@ deploy-kubernetes:
   script:
     # Check if Docker is running
     - if (!(Test-Path "//./pipe/docker_engine")) { throw "Docker Desktop is not running. Please start Docker Desktop and try again." }
-    # Handle service account
+    # Handle Kubernetes service account
     - $bytes = [System.Text.Encoding]::UTF8.GetBytes($GCP_K8S_SERVICE_ACCOUNT_KEY)
     - $encodedText = [Convert]::ToBase64String($bytes)
     - Set-Content -Path "$env:TEMP\k8s-key.json" -Value $GCP_K8S_SERVICE_ACCOUNT_KEY
@@ -151,15 +151,13 @@ deploy-kubernetes:
     - gcloud auth activate-service-account --key-file="$env:TEMP\k8s-key.json"
     - gcloud config set project $GCP_PROJECT_ID
     - gcloud auth configure-docker ${GCP_REGION}-docker.pkg.dev
-    # Build and push Docker image
+    # Build and push Docker image (reuse the same image)
     - docker build -t $DOCKER_IMAGE ./book_service
     - docker push $DOCKER_IMAGE
     # Configure kubectl
     - gcloud container clusters get-credentials $KUBE_CLUSTER --region $GCP_REGION --project $GCP_PROJECT_ID
     # Create namespace if it doesn't exist
     - kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
-    # Create service account and role binding
-    - kubectl apply -f ./book_service/kubernetes/service-account.yaml -n $KUBE_NAMESPACE
     # Prepare secrets
     - $datasourceUrl = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("jdbc:postgresql://${GCP_PROJECT_ID}:europe-west4:book-service-db/db3"))
     - $datasourceUsername = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("user3"))

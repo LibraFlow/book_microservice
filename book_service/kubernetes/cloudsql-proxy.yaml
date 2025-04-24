@@ -11,7 +11,7 @@ spec:
       labels:
         app: cloudsql-proxy
     spec:
-      serviceAccountName: cloudsql-proxy-sa
+      serviceAccountName: kubernetes-deploy@libraflow-457510.iam.gserviceaccount.com
       containers:
       - name: cloudsql-proxy
         image: gcr.io/cloudsql-docker/gce-proxy:1.33.2
