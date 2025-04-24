@@ -8,6 +8,7 @@ kind: Deployment
 metadata:
   name: cloudsql-proxy
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: cloudsql-proxy

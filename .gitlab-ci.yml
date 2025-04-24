@@ -166,8 +166,8 @@ deploy-kubernetes:
     # Create and annotate service account for Cloud SQL proxy
     - kubectl create serviceaccount cloudsql-sa -n $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
     - kubectl annotate serviceaccount cloudsql-sa -n $KUBE_NAMESPACE "iam.gke.io/gcp-service-account=kubernetes-deploy@${GCP_PROJECT_ID}.iam.gserviceaccount.com" --overwrite
-    # Apply Cloud SQL proxy deployment
-    - kubectl apply -f ./book_service/kubernetes/cloudsql-proxy.yaml -n $KUBE_NAMESPACE
+    # Apply Cloud SQL proxy deployment with environment variable substitution
+    - (Get-Content ./book_service/kubernetes/cloudsql-proxy.yaml) -replace '\${GCP_PROJECT_ID}', $GCP_PROJECT_ID | kubectl apply -f - -n $KUBE_NAMESPACE
     # Apply main service deployment
     - kubectl apply -f ./book_service/kubernetes/deployment.yaml -n $KUBE_NAMESPACE
     - kubectl apply -f ./book_service/kubernetes/service.yaml -n $KUBE_NAMESPACE
