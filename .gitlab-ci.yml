@@ -162,6 +162,7 @@ deploy-kubernetes:
     # Apply service account and resources
     - kubectl apply -f ./book_service/kubernetes/service-account.yaml -n $KUBE_NAMESPACE
     - kubectl apply -f ./book_service/kubernetes/cloudsql-proxy.yaml -n $KUBE_NAMESPACE
+    - kubectl apply -f ./book_service/kubernetes/resource-quota.yaml -n $KUBE_NAMESPACE
     # Replace variables in deployment.yaml and apply
     - (Get-Content ./book_service/kubernetes/deployment.yaml) -replace '\${GCP_REGION}', $GCP_REGION -replace '\${GCP_PROJECT_ID}', $GCP_PROJECT_ID -replace '\${CI_COMMIT_SHA}', $CI_COMMIT_SHA | kubectl apply -f - -n $KUBE_NAMESPACE
     - kubectl apply -f ./book_service/kubernetes/service.yaml -n $KUBE_NAMESPACE
