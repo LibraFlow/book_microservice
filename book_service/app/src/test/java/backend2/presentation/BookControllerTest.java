@@ -10,9 +10,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.junit.jupiter.api.AfterEach;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.Collections;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collection;
+import org.springframework.security.core.GrantedAuthority;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,6 +68,7 @@ public class BookControllerTest {
     @Test
     void createBookTest() {
         // Arrange
+        mockAuthenticationWithRole("ROLE_ADMINISTRATOR");
         when(addBookUseCase.addBook(any(BookDTO.class))).thenReturn(testBookDTO);
 
         // Act
@@ -74,6 +85,7 @@ public class BookControllerTest {
     void deleteBookTest() {
         // Arrange
         Integer bookId = 1;
+        mockAuthenticationWithRole("ROLE_ADMINISTRATOR");
         doNothing().when(deleteBookUseCase).deleteBook(anyInt());
 
         // Act
@@ -123,6 +135,7 @@ public class BookControllerTest {
     void updateBookTest() {
         // Arrange
         Integer bookId = 1;
+        mockAuthenticationWithRole("ROLE_ADMINISTRATOR");
         when(updateBookUseCase.updateBook(anyInt(), any(BookDTO.class))).thenReturn(testBookDTO);
 
         // Act
@@ -133,5 +146,20 @@ public class BookControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(testBookDTO, response.getBody());
         verify(updateBookUseCase, times(1)).updateBook(bookId, testBookDTO);
+    }
+
+    private void mockAuthenticationWithRole(String role) {
+        Authentication authentication = mock(Authentication.class);
+        Collection<? extends GrantedAuthority> authorities =
+            Collections.singletonList(new SimpleGrantedAuthority(role));
+        when(authentication.getAuthorities()).thenReturn((Collection) authorities);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
     }
 } 
