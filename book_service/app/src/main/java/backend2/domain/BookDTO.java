@@ -5,6 +5,7 @@ import lombok.*;
 @Builder
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class BookDTO {
     private Integer id;
     private String author;

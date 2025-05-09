@@ -3,6 +3,7 @@ package backend2.business.book;
 import backend2.domain.BookDTO;
 import backend2.persistence.BookRepository;
 import backend2.business.mapper.BookMapper;
+import backend2.exception.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,6 @@ public class GetBookUseCase {
     public BookDTO getBook(Integer id) {
         return bookRepository.findById(id)
                 .map(bookMapper::toDTO)
-                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
     }
 }

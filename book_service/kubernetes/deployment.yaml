@@ -19,7 +19,7 @@ spec:
       - name: book-service
         image: ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/book-service/book-service:${CI_COMMIT_SHA}
         ports:
-        - containerPort: 8080
+        - containerPort: 8082
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: "prod"
@@ -45,13 +45,13 @@ spec:
         readinessProbe:
           httpGet:
             path: /actuator/health
-            port: 8080
+            port: 8082
           initialDelaySeconds: 30
           periodSeconds: 10
         livenessProbe:
           httpGet:
             path: /actuator/health
-            port: 8080
+            port: 8082
           initialDelaySeconds: 60
           periodSeconds: 15
 ---
