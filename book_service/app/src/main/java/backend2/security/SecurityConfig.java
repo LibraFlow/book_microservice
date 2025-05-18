@@ -27,7 +27,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/books/**").hasAnyRole("ADMINISTRATOR", "LIBRARIAN")
+                .requestMatchers("/api/v1/books/**").hasAnyRole("ADMINISTRATOR", "LIBRARIAN", "CUSTOMER")
                 .anyRequest().permitAll()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
