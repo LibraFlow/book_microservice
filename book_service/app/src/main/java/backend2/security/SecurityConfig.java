@@ -27,8 +27,8 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/books/**").hasAnyRole("ADMINISTRATOR", "LIBRARIAN", "CUSTOMER")
-                .anyRequest().permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/books", "/api/v1/books/{id}").permitAll()
+                .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
