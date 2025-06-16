@@ -20,7 +20,14 @@ public class GetAllBooksByGenreUseCase {
 
     @Transactional
     public List<BookDTO> getAllBooksByGenre(String genre) {
-        return bookRepository.findByGenre(genre)
+        return bookRepository.findByGenreAndDeletedFalse(genre)
+                .stream()
+                .map(bookMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<BookDTO> getAllDeletedBooksByGenre(String genre) {
+        return bookRepository.findByGenreAndDeletedTrue(genre)
                 .stream()
                 .map(bookMapper::toDTO)
                 .collect(Collectors.toList());

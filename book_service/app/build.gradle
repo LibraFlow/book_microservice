@@ -65,6 +65,15 @@ dependencies {
 
     // OAuth2 Resource Server
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // Spring AMQP RabbitMQ dependency
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
+    // Kafka dependencies
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -117,5 +126,5 @@ dependencyCheck {
         }
     }
     // Disable automatic updates
-    autoUpdate = false
+    autoUpdate = true
 }

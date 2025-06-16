@@ -75,11 +75,28 @@ public class BookController {
         return ResponseEntity.ok(updateBookUseCase.updateBook(id, bookDto));
     }
 
-    /* @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<Map<String, String>> handleInternalServerError(Exception ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("message", "An unexpected error occurred. Please try again later.");
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    } */
+    @GetMapping("/regardless/{id}")
+    public ResponseEntity<BookDTO> getBookRegardlessOfDeleted(@PathVariable Integer id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdminOrLibrarian = authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch(role -> role.equals("ROLE_ADMINISTRATOR") || role.equals("ROLE_LIBRARIAN"));
+        if (!isAdminOrLibrarian) {
+            return ResponseEntity.status(403).build();
+        }
+        BookDTO book = getBookUseCase.getBookRegardlessOfDeleted(id);
+        return ResponseEntity.ok(book);
+    }
+
+    @GetMapping("/deleted")
+    public ResponseEntity<List<BookDTO>> getAllDeletedBooksByGenre(@RequestParam String genre) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdminOrLibrarian = authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch(role -> role.equals("ROLE_ADMINISTRATOR") || role.equals("ROLE_LIBRARIAN"));
+        if (!isAdminOrLibrarian) {
+            return ResponseEntity.status(403).build();
+        }
+        return ResponseEntity.ok(getAllBooksByGenreUseCase.getAllDeletedBooksByGenre(genre));
+    }
 }

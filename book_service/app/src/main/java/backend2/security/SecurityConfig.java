@@ -26,7 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
+            .authorizeHttpRequests(authz -> authz
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/books", "/api/v1/books/{id}").permitAll()
                 .anyRequest().authenticated()
             )

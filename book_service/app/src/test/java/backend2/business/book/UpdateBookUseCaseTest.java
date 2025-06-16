@@ -10,6 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -35,6 +39,7 @@ class UpdateBookUseCaseTest {
     private BookEntity updatedBookEntity;
     private BookEntity savedBookEntity;
     private LocalDate testCreatedAt;
+    private BookEntity testBookEntity;
 
     @BeforeEach
     void setUp() {
@@ -76,6 +81,8 @@ class UpdateBookUseCaseTest {
         savedBookEntity.setYear(2024);
         savedBookEntity.setDescription("Updated Description");
         savedBookEntity.setCreatedAt(testCreatedAt);
+
+        testBookEntity = BookEntity.builder().id(1).title("Test Book").build();
     }
 
     @Test
@@ -138,5 +145,29 @@ class UpdateBookUseCaseTest {
         verify(bookRepository).save(argThat(entity -> 
             entity.getCreatedAt().equals(testCreatedAt)
         ));
+    }
+
+    @Test
+    void updateBook_ShouldLogAuditTrail() {
+        // Arrange
+        Logger logger = (Logger) LoggerFactory.getLogger(UpdateBookUseCase.class);
+        @SuppressWarnings("unchecked")
+        Appender<ILoggingEvent> mockAppender = mock(Appender.class);
+        logger.addAppender(mockAppender);
+
+        when(bookRepository.findById(anyInt())).thenReturn(java.util.Optional.of(testBookEntity));
+        when(bookMapper.toEntity(any(BookDTO.class))).thenReturn(testBookEntity);
+        when(bookRepository.save(any(BookEntity.class))).thenReturn(testBookEntity);
+        when(bookMapper.toDTO(any(BookEntity.class))).thenReturn(testBookDTO);
+
+        // Act
+        updateBookUseCase.updateBook(1, testBookDTO);
+
+        // Assert: verify that the audit log message was produced
+        verify(mockAppender, times(1)).doAppend(argThat(event ->
+            event.getFormattedMessage().contains("AUDIT: Book updated") &&
+            event.getFormattedMessage().contains("bookId=" + testBookEntity.getId())
+        ));
+        logger.detachAppender(mockAppender);
     }
 } 

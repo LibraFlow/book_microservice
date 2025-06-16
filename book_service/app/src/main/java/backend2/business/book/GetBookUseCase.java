@@ -22,4 +22,10 @@ public class GetBookUseCase {
                 .map(bookMapper::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
     }
+
+    public BookDTO getBookRegardlessOfDeleted(Integer id) {
+        return bookRepository.findById(id)
+            .map(bookMapper::toDTO)
+            .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
+    }
 }

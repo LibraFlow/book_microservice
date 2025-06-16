@@ -25,6 +25,7 @@ public class BookMapper {
                 .title(Encode.forHtml(entity.getTitle()))
                 .genre(Encode.forHtml(entity.getGenre()))
                 .description(Encode.forHtml(entity.getDescription()))
+                .deleted(entity.getDeleted())
                 .build();
     }
 
@@ -41,6 +42,7 @@ public class BookMapper {
                 .genre(dto.getGenre())
                 .description(dto.getDescription())
                 .createdAt(dto.getId() == null ? LocalDate.now() : null) // Set createdAt only for new entities
+                .deleted(dto.getDeleted() != null ? dto.getDeleted() : false)
                 .build();
     }
 }

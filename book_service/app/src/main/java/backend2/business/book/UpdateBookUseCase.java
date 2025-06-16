@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.owasp.encoder.Encode;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +18,7 @@ public class UpdateBookUseCase {
 
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
+    private final Logger logger = LoggerFactory.getLogger(UpdateBookUseCase.class);
 
     @Transactional
     public BookDTO updateBook(Integer id, BookDTO bookDto) {
@@ -28,6 +31,8 @@ public class UpdateBookUseCase {
         updatedEntity.setCreatedAt(existingBook.getCreatedAt()); // Preserve creation date
 
         BookEntity savedBook = bookRepository.save(updatedEntity);
+        // Audit log: bookId and timestamp
+        logger.info("AUDIT: Book updated - bookId={}, timestamp={}", savedBook.getId(), java.time.Instant.now());
         return bookMapper.toDTO(savedBook);
     }
 }

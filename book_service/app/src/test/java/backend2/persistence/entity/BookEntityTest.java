@@ -127,15 +127,24 @@ class BookEntityTest {
     void testBookEntityAllArgsConstructor() {
         LocalDate testDate = LocalDate.now();
         
-        BookEntity entity = new BookEntity(1, "Test Author", 2023, "Test Title", 
-                "Fiction", "Test Description", testDate);
+        BookEntity entity = BookEntity.builder()
+                .id(1)
+                .author("Test Author")
+                .year(2023)
+                .title("Test Title")
+                .genre("Horror")
+                .description("Test Description")
+                .createdAt(LocalDate.now())
+                .deleted(false)
+                .build();
 
         assertEquals(1, entity.getId());
         assertEquals("Test Author", entity.getAuthor());
         assertEquals(2023, entity.getYear());
         assertEquals("Test Title", entity.getTitle());
-        assertEquals("Fiction", entity.getGenre());
+        assertEquals("Horror", entity.getGenre());
         assertEquals("Test Description", entity.getDescription());
-        assertEquals(testDate, entity.getCreatedAt());
+        assertEquals(LocalDate.now(), entity.getCreatedAt());
+        assertEquals(false, entity.getDeleted());
     }
 } 

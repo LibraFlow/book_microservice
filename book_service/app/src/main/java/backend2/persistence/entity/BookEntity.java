@@ -32,4 +32,8 @@ public class BookEntity {
 
     @Column(nullable = false)
     private LocalDate createdAt;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deleted = false;
 }

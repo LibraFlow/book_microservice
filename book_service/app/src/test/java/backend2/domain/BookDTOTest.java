@@ -30,7 +30,15 @@ class BookDTOTest {
     @Test
     void testBookDTOAllArgsConstructor() {
         // Arrange & Act
-        BookDTO bookDTO = new BookDTO(1, "Test Author", 2023, "Test Book", "Horror", "Test Description");
+        BookDTO bookDTO = BookDTO.builder()
+                .id(1)
+                .author("Test Author")
+                .year(2023)
+                .title("Test Book")
+                .genre("Horror")
+                .description("Test Description")
+                .deleted(false)
+                .build();
 
         // Assert
         assertNotNull(bookDTO);

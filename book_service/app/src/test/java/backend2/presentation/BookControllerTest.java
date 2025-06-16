@@ -148,6 +148,40 @@ public class BookControllerTest {
         verify(updateBookUseCase, times(1)).updateBook(bookId, testBookDTO);
     }
 
+    @Test
+    void createBook_AsLibrarian_ShouldSucceed() {
+        mockAuthenticationWithRole("ROLE_LIBRARIAN");
+        when(addBookUseCase.addBook(any(BookDTO.class))).thenReturn(testBookDTO);
+        ResponseEntity<BookDTO> response = bookController.createBook(testBookDTO);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(testBookDTO, response.getBody());
+    }
+
+    @Test
+    void createBook_AsRegularUser_ShouldBeDenied() {
+        mockAuthenticationWithRole("ROLE_USER");
+        ResponseEntity<BookDTO> response = bookController.createBook(testBookDTO);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void updateBook_AsLibrarian_ShouldSucceed() {
+        Integer bookId = 1;
+        mockAuthenticationWithRole("ROLE_LIBRARIAN");
+        when(updateBookUseCase.updateBook(anyInt(), any(BookDTO.class))).thenReturn(testBookDTO);
+        ResponseEntity<BookDTO> response = bookController.updateBook(bookId, testBookDTO);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(testBookDTO, response.getBody());
+    }
+
+    @Test
+    void updateBook_AsRegularUser_ShouldBeDenied() {
+        Integer bookId = 1;
+        mockAuthenticationWithRole("ROLE_USER");
+        ResponseEntity<BookDTO> response = bookController.updateBook(bookId, testBookDTO);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
     private void mockAuthenticationWithRole(String role) {
         Authentication authentication = mock(Authentication.class);
         Collection<? extends GrantedAuthority> authorities =

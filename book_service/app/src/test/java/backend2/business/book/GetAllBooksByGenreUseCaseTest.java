@@ -82,7 +82,7 @@ class GetAllBooksByGenreUseCaseTest {
     void getAllBooksByGenre_Success() {
         // Arrange
         String genre = "Horror";
-        when(bookRepository.findByGenre(genre)).thenReturn(testBookEntities);
+        when(bookRepository.findByGenreAndDeletedFalse(genre)).thenReturn(testBookEntities);
         when(bookMapper.toDTO(testBookEntity1)).thenReturn(testBookDTO1);
         when(bookMapper.toDTO(testBookEntity2)).thenReturn(testBookDTO2);
 
@@ -95,7 +95,7 @@ class GetAllBooksByGenreUseCaseTest {
         assertEquals(expectedBookDTOs, result);
 
         // Verify interactions
-        verify(bookRepository, times(1)).findByGenre(genre);
+        verify(bookRepository, times(1)).findByGenreAndDeletedFalse(genre);
         verify(bookMapper, times(1)).toDTO(testBookEntity1);
         verify(bookMapper, times(1)).toDTO(testBookEntity2);
     }
@@ -104,7 +104,7 @@ class GetAllBooksByGenreUseCaseTest {
     void getAllBooksByGenre_EmptyResult() {
         // Arrange
         String genre = "NonExistentGenre";
-        when(bookRepository.findByGenre(genre)).thenReturn(Arrays.asList());
+        when(bookRepository.findByGenreAndDeletedFalse(genre)).thenReturn(Arrays.asList());
 
         // Act
         List<BookDTO> result = getAllBooksByGenreUseCase.getAllBooksByGenre(genre);
@@ -114,7 +114,7 @@ class GetAllBooksByGenreUseCaseTest {
         assertTrue(result.isEmpty());
 
         // Verify interactions
-        verify(bookRepository, times(1)).findByGenre(genre);
+        verify(bookRepository, times(1)).findByGenreAndDeletedFalse(genre);
         verify(bookMapper, never()).toDTO(any());
     }
 
@@ -128,7 +128,7 @@ class GetAllBooksByGenreUseCaseTest {
         assertTrue(result.isEmpty());
 
         // Verify interactions
-        verify(bookRepository, times(1)).findByGenre(null);
+        verify(bookRepository, times(1)).findByGenreAndDeletedFalse(null);
         verify(bookMapper, never()).toDTO(any());
     }
 } 
