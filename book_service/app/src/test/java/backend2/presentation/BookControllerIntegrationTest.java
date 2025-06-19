@@ -1,6 +1,7 @@
 package backend2.presentation;
 
 import backend2.domain.BookDTO;
+import backend2.persistence.BookRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -21,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class BookControllerIntegrationTest {
 
     @Autowired
@@ -28,6 +31,18 @@ public class BookControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+    
+    @Autowired
+    private BookRepository bookRepository;
+
+    @Test
+    public void testDatabaseConnection() {
+        // Simple test to verify database connectivity
+        assertNotNull(bookRepository, "BookRepository should be autowired");
+        // Try to count books (this will test the database connection)
+        long count = bookRepository.count();
+        System.out.println("Database connection test: Found " + count + " books in database");
+    }
 
     @Test
     @WithMockUser(roles = {"ADMINISTRATOR"})
@@ -212,10 +227,18 @@ public class BookControllerIntegrationTest {
                 .andExpect(status().isNoContent());
 
         // Verify the book is deleted by trying to get it
-        mockMvc.perform(get("/api/v1/books/" + bookId))
+        MvcResult getResult = mockMvc.perform(get("/api/v1/books/" + bookId))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.deleted").value(true));
+                .andReturn();
+        
+        // Debug: Print the actual response
+        String responseBody = getResult.getResponse().getContentAsString();
+        System.out.println("Response after deletion: " + responseBody);
+        
+        // Parse the response and check the deleted field
+        BookDTO deletedBook = objectMapper.readValue(responseBody, BookDTO.class);
+        assertTrue(deletedBook.getDeleted(), "Book should be marked as deleted");
     }
 
     @Test
