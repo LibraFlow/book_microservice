@@ -4,6 +4,7 @@ COPY . .
 RUN ./gradlew bootJar
 
 FROM openjdk:21-jdk-slim
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/app/build/libs/*.jar app.jar
 
