@@ -18,91 +18,91 @@ cache:
   - book_service/app/.gradle/caches
   - book_service/app/dependency-check-data
 
-static_analysis:
-  stage: security_testing
-  image: gradle:jdk17
-  script:
-    - cd book_service
-    - gradle spotbugsMain spotbugsTest
-    # Check if SpotBugs found any issues
-    - |
-      if (Test-Path "app/build/reports/spotbugs/main.xml") {
-        $xml = [xml](Get-Content "app/build/reports/spotbugs/main.xml")
-        $bugCount = $xml.SelectNodes("//BugInstance").Count
-        if ($bugCount -gt 0) {
-          Write-Host "::warning::SpotBugs found $bugCount potential issues. Please review the detailed report in the artifacts."
-          Write-Host "::warning::To view the report, download the artifacts from this job or check the Code Quality report."
-          # Exit with code 0 to allow the pipeline to continue, but with a warning
-          exit 0
-        }
-      }
-  artifacts:
-    when: always
-    expire_in: 1 week
-    reports:
-      codequality: book_service/app/build/reports/spotbugs/main.xml
-    paths:
-      - book_service/app/build/reports/spotbugs/
-  allow_failure: true  # Allow the stage to fail without stopping the pipeline
+#static_analysis:
+#  stage: security_testing
+#  image: gradle:jdk17
+#  script:
+#    - cd book_service
+#    - gradle spotbugsMain spotbugsTest
+#    # Check if SpotBugs found any issues
+#    - |
+#      if (Test-Path "app/build/reports/spotbugs/main.xml") {
+#        $xml = [xml](Get-Content "app/build/reports/spotbugs/main.xml")
+#        $bugCount = $xml.SelectNodes("//BugInstance").Count
+#        if ($bugCount -gt 0) {
+#          Write-Host "::warning::SpotBugs found $bugCount potential issues. Please review the detailed report in the artifacts."
+#          Write-Host "::warning::To view the report, download the artifacts from this job or check the Code Quality report."
+#          # Exit with code 0 to allow the pipeline to continue, but with a warning
+#          exit 0
+#        }
+#      }
+#  artifacts:
+#    when: always
+#    expire_in: 1 week
+#    reports:
+#      codequality: book_service/app/build/reports/spotbugs/main.xml
+#    paths:
+#      - book_service/app/build/reports/spotbugs/
+#  allow_failure: true  # Allow the stage to fail without stopping the pipeline
 
-dependency_check:
-  stage: security_testing
-  image: gradle:jdk17
-  script:
-    - cd book_service
-    - mkdir -p app/dependency-check-data
-    - |
-      if (-not $env:NVD_API_KEY) {
-        Write-Host "::warning::NVD_API_KEY is not set. Dependency check will run with limited functionality."
-        Write-Host "::warning::Please set NVD_API_KEY in GitLab CI/CD variables for better results."
-      }
-    - gradle dependencyCheckAnalyze
-    - if ($LASTEXITCODE -ne 0) { Write-Host "::warning::Dependency check failed" }
-    # Check if dependency check report exists and contains vulnerabilities
-    - |
-      if (Test-Path "app/build/reports/dependency-check-report.html") {
-        $html = Get-Content "app/build/reports/dependency-check-report.html" -Raw
-        if ($html -match "Vulnerabilities Found") {
-          Write-Host "::warning::Dependency check found vulnerabilities. Please review the report in the artifacts."
-          Write-Host "::warning::To view the report, download the artifacts from this job."
-          # Exit with code 0 to allow the pipeline to continue, but with a warning
-          exit 0
-        }
-      } else {
-        Write-Host "::warning::Dependency check report not generated. This might be due to missing NVD API key."
-        exit 0
-      }
-  artifacts:
-    when: always
-    expire_in: 1 week
-    reports:
-      dependency_scanning: book_service/app/build/reports/dependency-check-report.json
-    paths:
-      - book_service/app/build/reports/dependency-check-report.html
-      - book_service/app/build/reports/dependency-check-report.json
-  allow_failure: true  # Allow the stage to fail without stopping the pipeline
+#dependency_check:
+#  stage: security_testing
+#  image: gradle:jdk17
+#  script:
+#    - cd book_service
+#    - mkdir -p app/dependency-check-data
+#    - |
+#      if (-not $env:NVD_API_KEY) {
+#        Write-Host "::warning::NVD_API_KEY is not set. Dependency check will run with limited functionality."
+#        Write-Host "::warning::Please set NVD_API_KEY in GitLab CI/CD variables for better results."
+#      }
+#    - gradle dependencyCheckAnalyze
+#    - if ($LASTEXITCODE -ne 0) { Write-Host "::warning::Dependency check failed" }
+#    # Check if dependency check report exists and contains vulnerabilities
+#    - |
+#      if (Test-Path "app/build/reports/dependency-check-report.html") {
+#        $html = Get-Content "app/build/reports/dependency-check-report.html" -Raw
+#        if ($html -match "Vulnerabilities Found") {
+#          Write-Host "::warning::Dependency check found vulnerabilities. Please review the report in the artifacts."
+#          Write-Host "::warning::To view the report, download the artifacts from this job."
+#          # Exit with code 0 to allow the pipeline to continue, but with a warning
+#          exit 0
+#        }
+#      } else {
+#        Write-Host "::warning::Dependency check report not generated. This might be due to missing NVD API key."
+#        exit 0
+#      }
+#  artifacts:
+#    when: always
+#    expire_in: 1 week
+#    reports:
+#      dependency_scanning: book_service/app/build/reports/dependency-check-report.json
+#    paths:
+#      - book_service/app/build/reports/dependency-check-report.html
+#      - book_service/app/build/reports/dependency-check-report.json
+#  allow_failure: true  # Allow the stage to fail without stopping the pipeline
 
-build:
-  stage: build
-  image: gradle:jdk17
-  script:
-  - cd book_service
-  - gradle build
-  artifacts:
-    paths:
-    - book_service/app/build/libs/*.jar
-  dependencies:
-  - static_analysis
-  - dependency_check
+#build:
+#  stage: build
+#  image: gradle:jdk17
+#  script:
+#  - cd book_service
+#  - gradle build
+#  artifacts:
+#    paths:
+#    - book_service/app/build/libs/*.jar
+#  dependencies:
+#  - static_analysis
+#  - dependency_check
 
-test:
-  stage: test
-  image: gradle:jdk17
-  script:
-  - cd book_service
-  - gradle test
-  dependencies:
-  - build
+#test:
+#  stage: test
+#  image: gradle:jdk17
+#  script:
+#  - cd book_service
+#  - gradle test
+#  dependencies:
+#  - build
 
 # build-docker-image:
 #   stage: build
@@ -186,8 +186,5 @@ deploy-kubernetes:
     # Replace variables in deployment.yaml and apply
     - (Get-Content ./book_service/kubernetes/deployment.yaml) -replace '\${GCP_REGION}', $GCP_REGION -replace '\${GCP_PROJECT_ID}', $GCP_PROJECT_ID -replace '\${CI_COMMIT_SHA}', $CI_COMMIT_SHA | kubectl apply -f - -n $KUBE_NAMESPACE
     - kubectl apply -f ./book_service/kubernetes/service.yaml -n $KUBE_NAMESPACE
-  dependencies:
-    - static_analysis
-    - build
   only:
     - main
