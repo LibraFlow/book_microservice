@@ -17,7 +17,8 @@ spec:
         image: gcr.io/cloudsql-docker/gce-proxy:1.33.2
         command:
           - "/cloud_sql_proxy"
-          - "-instances=${GCP_PROJECT_ID}:europe-west4:book-service-db=tcp:5432"
+          - "--structured-logs"
+          - "${GCP_PROJECT_ID}:europe-west4:book-service-db"
         ports:
           - containerPort: 5432
         resources:
