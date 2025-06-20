@@ -3,7 +3,7 @@ WORKDIR /app
 COPY . .
 RUN ./gradlew bootJar
 
-FROM openjdk:21-jdk-alpine
+FROM gcr.io/distroless/java21-debian12
 WORKDIR /app
 COPY --from=build /app/app/build/libs/*.jar app.jar
 
