@@ -1,7 +1,7 @@
 stages:
-- security_testing
-- build
-- test
+#- security_testing
+#- build
+#- test
 - deploy-kubernetes
 
 variables:

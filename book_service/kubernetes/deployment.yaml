@@ -37,11 +37,11 @@ spec:
               key: spring.datasource.password
         resources:
           requests:
-            cpu: "500m"
-            memory: "512Mi"
+            cpu: "200m"
+            memory: "256Mi"
           limits:
-            cpu: "1000m"
-            memory: "1Gi"
+            cpu: "400m"
+            memory: "512Mi"
         readinessProbe:
           httpGet:
             path: /actuator/health
